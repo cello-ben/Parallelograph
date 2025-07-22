@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using Parallelograph.Models;
+﻿using Parallelograph.Controllers;
 
 namespace Parallelograph
 {
@@ -18,6 +17,7 @@ namespace Parallelograph
             }
             ParallelChecker checker = new();
             checker.CheckParallels();
+            MusicXmlParser parser = new(args[0]);
         }
     }
 }

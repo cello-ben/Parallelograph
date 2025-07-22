@@ -1,4 +1,4 @@
-namespace Parallelograph.Models
+namespace Parallelograph.Controllers
 {
     internal class ParallelChecker
     {
