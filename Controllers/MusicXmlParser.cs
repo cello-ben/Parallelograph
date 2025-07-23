@@ -80,7 +80,7 @@ namespace Parallelograph.Controllers
                             NoteMap[voice] = new List<int>();
                         }
 
-                        NoteMap[voice].Add((octave * 12) + pitch);
+                        NoteMap[voice].Add((octave * 12) + pitch); //We likely can get away without octave displacement in the map for now, but I want to keep this intact in case we need it later.
                         DBG.WriteLine($"Pitch: {pitch} Octave: {octave} Voice: {voice}");
                         DBG.WriteLine("Parsing complete. Note map:");
                         foreach (KeyValuePair<int, List<int>> pair in NoteMap)

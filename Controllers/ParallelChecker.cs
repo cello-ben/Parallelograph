@@ -80,7 +80,8 @@ namespace Parallelograph.Controllers
 
                 foreach (PerfectFifth fifth in curr)
                 {
-
+                    // PerfectFifth check = new(voices!)
+                    // if (fifths.Contains)
                 }
             }
         }
