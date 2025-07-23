@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<!-- Basic 4-voice, homorhythmic progression with parallel fifths stemming from the non-use of a cadential 6/4 after a German augmented sixth chord. -->
 <score-partwise version="4.0">
   <work>
-    <work-title>Untitled score</work-title>
+    <work-title>Voice Leading Example</work-title>
     </work>
   <identification>
-    <creator type="composer">Composer / arranger</creator>
+    <creator type="composer">Benjamin R. Fryxell</creator>
     <encoding>
       <software>MuseScore 4.3.2</software>
       <encoding-date>2025-07-22</encoding-date>

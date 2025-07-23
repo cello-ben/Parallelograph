@@ -15,9 +15,8 @@ namespace Parallelograph
                 Usage();
                 return;
             }
-            ParallelChecker checker = new();
-            checker.CheckParallels();
-            MusicXmlParser parser = new(args[0]);
+            ParallelChecker parallelChecker = new(args[0]);
+            parallelChecker.CheckParallels();
         }
     }
 }
