@@ -17,6 +17,8 @@ namespace Parallelograph
             }
             ParallelChecker parallelChecker = new(args[0]);
             parallelChecker.CheckParallels();
+            bool parallelFifths = parallelChecker.ParallelFifths;
+            bool parallelOctaves = parallelChecker.ParallelOctaves;
         }
     }
 }

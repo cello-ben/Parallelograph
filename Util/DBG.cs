@@ -1,5 +1,3 @@
-#undef DEBUG
-
 namespace Parallelograph.Util
 {
     internal static class DBG //TODO non-static and save state if prefixed.

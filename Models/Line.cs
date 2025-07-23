@@ -1,10 +1,10 @@
-namespace Parallelograph.Models
-{
-    internal class Line
-    {
-        public Line()
-        {
+// namespace Parallelograph.Models
+// {
+//     internal class Line
+//     {
+//         public Line()
+//         {
 
-        }
-    }
-}
+//         }
+//     }
+// }

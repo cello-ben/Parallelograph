@@ -9,11 +9,11 @@ namespace Parallelograph.Controllers
         private const int VOICE_COUNT = 4;
         private const int PERFECT_FIFTH_DIFFERENTIAL = 7;
         private const int PERFECT_OCTAVE_DIFFERENTIAL = 12;
-        private string[] VOICE_NAMES = { "Soprano", "Alto", "Tenor", "Bass" };
-        private bool parallelFifths = false;
-        private bool parallelOctaves = false;
-        private HashSet<PerfectFifth> fifths = new();
-        private HashSet<PerfectOctave> octaves = new();
+        private readonly string[] VOICE_NAMES = { "Soprano", "Alto", "Tenor", "Bass" };
+        public bool ParallelFifths = false;
+        public bool ParallelOctaves = false;
+        private HashSet<Interval> fifths = new();
+        private HashSet<Interval> octaves = new();
         private List<List<int>>? voices;
 
         public ParallelChecker(string? xmlFilePath)
@@ -34,61 +34,76 @@ namespace Parallelograph.Controllers
                     throw new InvalidMusicXmlDataException("Note count mismatch between voices. Currently, only homorhythmic analysis is supported.");
                 }
                 for (int i = 0; i < voices!.Count; i++)
+                {
+                    DBG.WriteLine($"i = {i}\nNotes:");
+                    foreach (int note in voices![i])
                     {
-                        DBG.WriteLine($"i = {i}\nNotes:");
-                        foreach (int note in voices![i])
-                        {
-                            DBG.Write($"{note} ");
-                        }
-                        DBG.Write("\n");
+                        DBG.Write($"{note} ");
                     }
+                    DBG.Write("\n");
+                }
+                DBG.WriteLine("Constructor logic finished successfully.");
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Exception found.");
                 DBG.WriteError(ex, "Failed to create parser. Please make sure you are passing a valid file.");
             }
         }
-
+        private bool IsPerfectFifth(Interval fifth)
+        {
+            return Math.Abs(voices![fifth.TopVoice][fifth.Pos] - voices![fifth.BottomVoice][fifth.Pos]) % PERFECT_FIFTH_DIFFERENTIAL == 0;
+        }
         private void CheckParallelFifths()
         {
-            PerfectFifth[] start = {
-                new(voices![0][0], voices![1][0], 0), //Soprano/Alto
-                new(voices![0][0], voices![2][0], 0), //Soprano/Tenor
-                new(voices![0][0], voices![3][0], 0), //Soprano/Bass
-                new(voices![1][0], voices![2][0], 0), //Alto/Tenor
-                new(voices![1][0], voices![3][0], 0), //Alto/Bass
-                new(voices![2][0], voices![3][0], 0) //Tenor/Bass
+            DBG.WriteLine("Checking parallel fifths.");
+            Interval[] start = {
+                new(0, 1, 0),
+                new(0, 2, 0),
+                new(0, 3, 0),
+                new(1, 2, 0),
+                new(1, 3, 0),
+                new(2, 3, 0)
             };
 
-            foreach (PerfectFifth fifth in start)
+            foreach (Interval interval in start)
             {
-                if (Math.Abs(fifth.TopVoice - fifth.BottomVoice) % PERFECT_FIFTH_DIFFERENTIAL == 0)
+                if (IsPerfectFifth(interval))
                 {
-                    fifths.Add(fifth);
+                    fifths.Add(interval);
                 }
             }
             for (int i = 1; i < voices!.Count; i++)
             {
-                PerfectFifth[] curr = {
-                        new(voices![0][i], voices![1][i], i),
-                        new(voices![0][i], voices![2][i], i),
-                        new(voices![0][i], voices![3][i], i),
-                        new(voices![1][i], voices![2][i], i),
-                        new(voices![1][i], voices![3][i], i),
-                        new(voices![2][i], voices![3][i], i)
+                Interval[] curr = {
+                        new(0, 1, i),
+                        new(0, 2, i),
+                        new(0, 3, i),
+                        new(1, 2, i),
+                        new(1, 3, i),
+                        new(2, 3, i)
                     };
 
-                foreach (PerfectFifth fifth in curr)
+                foreach (Interval interval in curr)
                 {
-                    // PerfectFifth check = new(voices!)
-                    // if (fifths.Contains)
+                    if (IsPerfectFifth(interval))
+                    {
+                        DBG.WriteLine($"{interval.ToString()} is a perfect fifth.");
+                        Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);
+                        fifths.Add(new(interval.TopVoice, interval.BottomVoice, interval.Pos));
+                        if (fifths.Contains(check))
+                        {
+                            ParallelFifths = true;
+                            Console.WriteLine($"Parallel fifths found between {VOICE_NAMES[interval.TopVoice]} and {VOICE_NAMES[interval.BottomVoice]} at {interval.Pos}.");
+                        }
+                    }
                 }
             }
         }
 
         private void CheckParallelOctaves()
         {
-            parallelOctaves = true;
+            // parallelOctaves = true;
         }
         public void CheckParallels()
         {
