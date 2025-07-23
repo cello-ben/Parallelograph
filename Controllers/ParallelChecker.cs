@@ -79,7 +79,7 @@ namespace Parallelograph.Controllers
                     };
 
                 foreach (PerfectFifth fifth in curr)
-                {scoobydoo
+                {
                     // PerfectFifth check = new(voices!)
                     // if (fifths.Contains)
                 }
