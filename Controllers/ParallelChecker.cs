@@ -1,42 +1,40 @@
 using Parallelograph.Models;
-using Parallelograph.Util;
+using Parallelograph.Util.Consts;
+using Parallelograph.Util.Debug;
 using Parallelograph.Util.Exceptions;
 
 namespace Parallelograph.Controllers
 {
     internal class ParallelChecker
     {
-        private const int VOICE_COUNT = 4;
-        private const int PERFECT_FIFTH_DIFFERENTIAL = 7;
-        private const int PERFECT_OCTAVE_DIFFERENTIAL = 12;
-        private readonly string[] VOICE_NAMES = { "Soprano", "Alto", "Tenor", "Bass" };
-        public bool ParallelFifths = false;
-        public bool ParallelOctaves = false;
-        private HashSet<Interval> fifths = new();
-        private HashSet<Interval> octaves = new();
-        private List<List<int>>? voices;
+        
+        public bool HasParallelFifths = false;
+        public bool HasParallelOctaves = false;
+        private HashSet<Interval> _fifths = [];
+        private HashSet<Interval> _octaves = [];
+        private List<List<int>>? _voices;
 
         public ParallelChecker(string? xmlFilePath)
         {
             try
             {
                 MusicXmlParser parser = new(xmlFilePath ?? "");
-                voices = parser.CoalesceAndGetFourParts();
+                _voices = parser.CoalesceAndGetFourParts();
                 DBG.WriteLine("In ParallelChecker constructor.");
-                if (voices is null || voices.Count != VOICE_COUNT)
+                if (_voices is null || _voices.Count != Consts.VOICE_COUNT)
                 {
                     throw new InvalidMusicXmlDataException("Invalid number of voices.");
                 }
-                if (voices[0].Count != voices[1].Count || voices[1].Count != voices[2].Count || //TODO ensure correct checks.
-                    voices[2].Count != voices[3].Count || voices[0].Count != voices[2].Count ||
-                    voices[0].Count != voices[3].Count || voices[1].Count != voices[3].Count)
+                if (_voices[0].Count != _voices[1].Count || _voices[1].Count != _voices[2].Count || //TODO ensure correct checks.
+                    _voices[2].Count != _voices[3].Count || _voices[0].Count != _voices[2].Count ||
+                    _voices[0].Count != _voices[3].Count || _voices[1].Count != _voices[3].Count)
                 {
                     throw new InvalidMusicXmlDataException("Note count mismatch between voices. Currently, only homorhythmic analysis is supported.");
                 }
-                for (int i = 0; i < voices!.Count; i++)
+                for (int i = 0; i < _voices!.Count; i++)
                 {
                     DBG.WriteLine($"i = {i}\nNotes:");
-                    foreach (int note in voices![i])
+                    foreach (int note in _voices![i])
                     {
                         DBG.Write($"{note} ");
                     }
@@ -50,9 +48,29 @@ namespace Parallelograph.Controllers
                 DBG.WriteError(ex, "Failed to create parser. Please make sure you are passing a valid file.");
             }
         }
-        private bool IsPerfectFifth(Interval fifth)
+
+        private bool IsPerfect(Interval interval, int differential, string intervalName)
         {
-            return Math.Abs(voices![fifth.TopVoice][fifth.Pos] - voices![fifth.BottomVoice][fifth.Pos]) % PERFECT_FIFTH_DIFFERENTIAL == 0;
+            int top = _voices![interval.TopVoice][interval.Pos], bottom = _voices![interval.BottomVoice][interval.Pos];
+            int noteDistance = Math.Abs(top - bottom);
+            bool isPerfect = noteDistance % differential == 0;
+
+            if (isPerfect)
+            {
+                string topVoiceName = Consts.VOICE_NAMES[interval.TopVoice],
+                    bottomVoiceName = Consts.VOICE_NAMES[interval.BottomVoice];
+
+                string topNoteData = $"({Consts.NOTE_NAMES[top % 12]}{top / 12}) ({top})",
+                    bottomNoteData = $"({Consts.NOTE_NAMES[bottom % 12]}{bottom / 12}) ({bottom})";
+
+                Console.WriteLine();
+                Console.WriteLine($"Found perfect {intervalName}:");
+                Console.WriteLine($"Top voice: {topVoiceName} {topNoteData}");
+                Console.WriteLine($"Bottom voice: {bottomVoiceName} {bottomNoteData}");
+                Console.WriteLine();
+            }
+
+            return noteDistance % differential == 0;
         }
         private void CheckParallelFifths()
         {
@@ -68,12 +86,12 @@ namespace Parallelograph.Controllers
 
             foreach (Interval interval in start)
             {
-                if (IsPerfectFifth(interval))
+                if (IsPerfect(interval, Consts.PERFECT_FIFTH_DIFFERENTIAL, "fifth"))
                 {
-                    fifths.Add(interval);
+                    _fifths.Add(interval);
                 }
             }
-            for (int i = 1; i < voices!.Count; i++)
+            for (int i = 1; i < _voices!.Count; i++)
             {
                 Interval[] curr = {
                         new(0, 1, i),
@@ -86,29 +104,72 @@ namespace Parallelograph.Controllers
 
                 foreach (Interval interval in curr)
                 {
-                    if (IsPerfectFifth(interval))
+                    if (IsPerfect(interval, Consts.PERFECT_FIFTH_DIFFERENTIAL, "fifth"))
                     {
-                        DBG.WriteLine($"{interval.ToString()} is a perfect fifth.");
+                        // DBG.WriteLine($"{interval.ToString()} is a perfect fifth.");
                         Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);
-                        fifths.Add(new(interval.TopVoice, interval.BottomVoice, interval.Pos));
-                        if (fifths.Contains(check))
+                        _fifths.Add(interval);
+                        if (_fifths.Contains(check))
                         {
-                            ParallelFifths = true;
-                            Console.WriteLine($"Parallel fifths found between {VOICE_NAMES[interval.TopVoice]} and {VOICE_NAMES[interval.BottomVoice]} at {interval.Pos}.");
+                            HasParallelFifths = true;
+                            string topName = Consts.VOICE_NAMES[interval.TopVoice], bottomName = Consts.VOICE_NAMES[interval.BottomVoice];
+                            Console.WriteLine($"Parallel fifths found between {topName} and {bottomName} at {interval.Pos}.");
                         }
                     }
                 }
             }
         }
-
         private void CheckParallelOctaves()
         {
-            // parallelOctaves = true;
+            DBG.WriteLine("Checking parallel octaves.");
+            Interval[] start = {
+                new(0, 1, 0),
+                new(0, 2, 0),
+                new(0, 3, 0),
+                new(1, 2, 0),
+                new(1, 3, 0),
+                new(2, 3, 0)
+            };
+
+            foreach (Interval interval in start)
+            {
+                if (IsPerfect(interval, Consts.PERFECT_OCTAVE_DIFFERENTIAL, "octave"))
+                {
+                    _octaves.Add(interval);
+                }
+            }
+            for (int i = 1; i < _voices!.Count; i++)
+            {
+                Interval[] curr = {
+                        new(0, 1, i),
+                        new(0, 2, i),
+                        new(0, 3, i),
+                        new(1, 2, i),
+                        new(1, 3, i),
+                        new(2, 3, i)
+                    };
+
+                foreach (Interval interval in curr)
+                {
+                    if (IsPerfect(interval, Consts.PERFECT_OCTAVE_DIFFERENTIAL, "octave"))
+                    {
+                        // DBG.WriteLine($"{interval.ToString()} is a perfect octave.");
+                        Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);
+                        _octaves.Add(interval);
+                        if (_octaves.Contains(check))
+                        {
+                            HasParallelOctaves = true;
+                            string topName = Consts.VOICE_NAMES[interval.TopVoice], bottomName = Consts.VOICE_NAMES[interval.BottomVoice];
+                            Console.WriteLine($"Parallel octaves found between {topName} and {bottomName} at {interval.Pos}.");
+                        }
+                    }
+                }
+            }
         }
         public void CheckParallels()
         {
             CheckParallelFifths();
-            CheckParallelOctaves();
+            CheckParallelOctaves(); //TODO add unison support.
         }
     }
 }

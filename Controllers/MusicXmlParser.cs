@@ -1,5 +1,6 @@
-using Parallelograph.Util;
+using Parallelograph.Util.Debug;
 using Parallelograph.Util.Exceptions;
+
 using System.Xml;
 using System.Xml.Linq;
 
@@ -14,31 +15,24 @@ namespace Parallelograph.Controllers
         {
             { "Bsharp", 0},
             { "C", 0 },
-            { "Cnatural", 0 },
             { "Csharp", 1 },
             { "Dflat", 1 },
             { "D", 2 },
-            { "Dnatural", 2 },
             { "Dsharp", 3 },
             { "Eflat", 3 },
             { "E", 4 },
-            { "Enatural", 4 },
             { "Fflat", 4 },
             { "Esharp", 5 },
             { "F", 5 },
-            { "Fnatural", 5 },
             { "Fsharp", 6 },
             { "Gflat", 6 },
             { "G", 7 },
-            { "Gnatural", 7 },
             { "Gsharp", 8 },
             { "Aflat", 8 },
             { "A", 9 },
-            { "Anatural", 9 },
             { "Asharp", 10 },
             { "Bflat", 10 },
             { "B", 11 },
-            { "Bnatural", 11 },
             { "Cflat", 11 },
         };
         private Dictionary<int, List<int>> NoteMap = new();
@@ -73,7 +67,9 @@ namespace Parallelograph.Controllers
                         DBG.WriteLine($"Octave: {octave}");
                         int voice = Int32.Parse(note.Element("voice").Value);
                         DBG.WriteLine($"Voice: {voice}");
-                        int pitch = PitchClasses[$"{note.Element("pitch")?.Element("step")?.Value}{note.Element("accidental")?.Value}"];
+                        string element = $"{note.Element("pitch")?.Element("step")?.Value}{note.Element("accidental")?.Value.Replace("natural", "")}";
+                        DBG.WriteLine(element);
+                        int pitch = PitchClasses[element];
 
                         if (!NoteMap.ContainsKey(voice))
                         {

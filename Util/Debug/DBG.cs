@@ -1,4 +1,4 @@
-namespace Parallelograph.Util
+namespace Parallelograph.Util.Debug
 {
     internal static class DBG //TODO non-static and save state if prefixed.
     {
