@@ -5,7 +5,7 @@ namespace Parallelograph.Util.Debug
         internal static void WriteLine(string message)
         {
 #if DEBUG
-            Console.WriteLine($"Debug: {message}");
+            Console.WriteLine($"<DEBUG> {message}");
 #endif
         }
 

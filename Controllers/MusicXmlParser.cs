@@ -37,7 +37,6 @@ namespace Parallelograph.Controllers
         };
         private Dictionary<int, List<int>> NoteMap = new();
         private List<List<int>> FourParts = new();
-        //Later, List<List<int>>, length 4, 0-indexed from the sorted note map. Start with 0, if perfect interval found in any of the others, add as pair.
         public MusicXmlParser(string musicXmlFilePath)
         {
             XDocument document;
@@ -68,6 +67,11 @@ namespace Parallelograph.Controllers
                         int voice = Int32.Parse(note.Element("voice").Value);
                         DBG.WriteLine($"Voice: {voice}");
                         string element = $"{note.Element("pitch")?.Element("step")?.Value}{note.Element("accidental")?.Value.Replace("natural", "")}";
+                        Console.Write(element);
+                        if (!PitchClasses.ContainsKey(element))
+                        {
+                            throw new InvalidMusicXmlDataException("Invalid note name found.");
+                        }
                         DBG.WriteLine(element);
                         int pitch = PitchClasses[element];
 

@@ -15,10 +15,13 @@ namespace Parallelograph
                 Usage();
                 return;
             }
+
             ParallelChecker parallelChecker = new(args[0]);
             parallelChecker.CheckParallels();
+            
             bool parallelFifths = parallelChecker.HasParallelFifths;
             bool parallelOctaves = parallelChecker.HasParallelOctaves;
+
             Console.WriteLine($"Parallel fifths: {parallelFifths} Parallel octaves: {parallelOctaves}");
         }
     }

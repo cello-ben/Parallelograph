@@ -44,14 +44,15 @@ namespace Parallelograph.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception found.");
-                DBG.WriteError(ex, "Failed to create parser. Please make sure you are passing a valid file.");
+                Console.Error.Write("Exception found:");
+                Console.Error.Write(ex);
+                Console.Error.Write("Failed to create parser. Please make sure you are passing a valid file.");
             }
         }
 
         private bool IsPerfect(Interval interval, int differential, string intervalName)
         {
-            int top = _voices![interval.TopVoice][interval.Pos], bottom = _voices![interval.BottomVoice][interval.Pos];
+            int top = _voices![interval.TopVoice][interval.Pos], bottom = _voices![interval.BottomVoice][interval.Pos]; //TODO more bounds checking before unwrapping.
             int noteDistance = Math.Abs(top - bottom);
             bool isPerfect = noteDistance % differential == 0;
 
@@ -106,7 +107,7 @@ namespace Parallelograph.Controllers
                 {
                     if (IsPerfect(interval, Consts.PERFECT_FIFTH_DIFFERENTIAL, "fifth"))
                     {
-                        // DBG.WriteLine($"{interval.ToString()} is a perfect fifth.");
+                        DBG.WriteLine($"{interval} is a perfect fifth.");
                         Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);
                         _fifths.Add(interval);
                         if (_fifths.Contains(check))
@@ -153,7 +154,7 @@ namespace Parallelograph.Controllers
                 {
                     if (IsPerfect(interval, Consts.PERFECT_OCTAVE_DIFFERENTIAL, "octave"))
                     {
-                        // DBG.WriteLine($"{interval.ToString()} is a perfect octave.");
+                        DBG.WriteLine($"{interval} is a perfect octave.");
                         Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);
                         _octaves.Add(interval);
                         if (_octaves.Contains(check))
