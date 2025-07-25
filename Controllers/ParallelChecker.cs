@@ -64,7 +64,7 @@ namespace Parallelograph.Controllers
         }
         public void _checkParallels(string intervalName, int differential)
         {
-            DBG.WriteLine("Checking parallel octaves.");
+            DBG.WriteLine($"Checking parallel {intervalName}s.");
             Interval[] start = {
                 new(0, 1, 0),
                 new(0, 2, 0),
@@ -76,7 +76,7 @@ namespace Parallelograph.Controllers
 
             foreach (Interval interval in start)
             {
-                if (IsPerfect(interval, Consts.PERFECT_OCTAVE_DIFFERENTIAL, "octave"))
+                if (IsPerfect(interval, differential, intervalName))
                 {
                     _intervals.Add(interval);
                 }
@@ -94,16 +94,16 @@ namespace Parallelograph.Controllers
 
                 foreach (Interval interval in curr)
                 {
-                    if (IsPerfect(interval, Consts.PERFECT_OCTAVE_DIFFERENTIAL, "octave"))
+		    if (IsPerfect(interval, differential, intervalName))
                     {
-                        DBG.WriteLine($"{interval} is a perfect octave.");
+                        DBG.WriteLine($"{interval} is a perfect {intervalName}.");
                         Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);
                         _intervals.Add(interval);
                         if (_intervals.Contains(check))
                         {
                             ParallelsPresent.Add(intervalName);
                             string topName = Consts.VOICE_NAMES[interval.TopVoice], bottomName = Consts.VOICE_NAMES[interval.BottomVoice];
-                            Console.WriteLine($"Parallel octaves found between {topName} and {bottomName} at {interval.Pos}.");
+                            Console.WriteLine($"Parallel {intervalName}s found between {topName} and {bottomName} at {interval.Pos}.");
                         }
                     }
                 }
