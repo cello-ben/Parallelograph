@@ -29,15 +29,6 @@ namespace Parallelograph.Controllers
                 {
                     throw new InvalidMusicXmlDataException("Note count mismatch between voices. Currently, only homorhythmic analysis is supported.");
                 }
-                for (int i = 0; i < _voices!.Count; i++)
-                {
-                    DBG.WriteLine($"i = {i}\nNotes:");
-                    foreach (int note in _voices![i])
-                    {
-                        DBG.Write($"{note} ");
-                    }
-                    DBG.Write("\n");
-                }
                 DBG.WriteLine("Constructor logic finished successfully.");
             }
             catch (Exception ex)

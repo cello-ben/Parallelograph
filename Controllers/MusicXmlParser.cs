@@ -51,28 +51,21 @@ namespace Parallelograph.Controllers
             try
             {
                 DBG.WriteLine("Parsing measures.");
-                int measureNumber = 1;
 #pragma warning disable CS8602 //We are handling the case where critical elements are null via an exception.
                 foreach (var measure in document.Root.Elements("part").Elements("measure"))
                 {
                     var notes = measure.Elements("note");
-                    var _notes = notes.Count();
-                    DBG.WriteLine($"{_notes}");
-                    DBG.WriteLine($"Parsing note(s) in measure {measureNumber++}.");
+                    var _notes = notes.Count();                                      
                     foreach (var note in notes)
                     {
 
                         int octave = Int32.Parse(note.Element("pitch").Element("octave").Value);
-                        DBG.WriteLine($"Octave: {octave}");
                         int voice = Int32.Parse(note.Element("voice").Value);
-                        DBG.WriteLine($"Voice: {voice}");
                         string element = $"{note.Element("pitch")?.Element("step")?.Value}{note.Element("accidental")?.Value.Replace("natural", "")}";
-                        Console.Write(element);
                         if (!PitchClasses.ContainsKey(element))
                         {
                             throw new InvalidMusicXmlDataException("Invalid note name found.");
                         }
-                        DBG.WriteLine(element);
                         int pitch = PitchClasses[element];
 
                         if (!NoteMap.ContainsKey(voice))
@@ -81,18 +74,7 @@ namespace Parallelograph.Controllers
                         }
 
                         NoteMap[voice].Add((octave * 12) + pitch); //We likely can get away without octave displacement in the map for now, but I want to keep this intact in case we need it later.
-                        DBG.WriteLine($"Pitch: {pitch} Octave: {octave} Voice: {voice}");
-                        DBG.WriteLine("Parsing complete. Note map:");
-                        foreach (KeyValuePair<int, List<int>> pair in NoteMap)
-                        {
-                            DBG.WriteLine($"Voice: {pair.Key} ");
-                            DBG.Write($"Pitches: ");
-                            foreach (int pitchClass in pair.Value)
-                            {
-                                DBG.Write($"{pitchClass} ");
-                            }
-                            DBG.Write("\n");
-                        }
+                      
                     }
                 }
 #pragma warning restore CS8602
