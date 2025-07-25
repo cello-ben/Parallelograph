@@ -1,4 +1,6 @@
-﻿using Parallelograph.Controllers;
+﻿using System.Globalization;
+using Parallelograph.Controllers;
+using Parallelograph.Util;
 
 namespace Parallelograph
 {
@@ -18,11 +20,12 @@ namespace Parallelograph
 
             ParallelChecker parallelChecker = new(args[0]);
             parallelChecker.CheckParallels();
-            
-            bool parallelFifths = parallelChecker.HasParallelFifths;
-            bool parallelOctaves = parallelChecker.HasParallelOctaves;
 
-            Console.WriteLine($"Parallel fifths: {parallelFifths} Parallel octaves: {parallelOctaves}");
+            Console.WriteLine("The following parallels were found:");
+            foreach (string interval in parallelChecker.ParallelsPresent)
+            {
+                Console.WriteLine(STR.ToTitleCase(interval));
+            }
         }
     }
 }

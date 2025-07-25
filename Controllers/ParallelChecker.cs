@@ -7,11 +7,9 @@ namespace Parallelograph.Controllers
 {
     internal class ParallelChecker
     {
-        
-        public bool HasParallelFifths = false;
-        public bool HasParallelOctaves = false;
-        private HashSet<Interval> _fifths = [];
-        private HashSet<Interval> _octaves = [];
+
+        public HashSet<string> ParallelsPresent = new();
+        private HashSet<Interval> _intervals = [];
         private List<List<int>>? _voices;
 
         public ParallelChecker(string? xmlFilePath)
@@ -73,54 +71,7 @@ namespace Parallelograph.Controllers
 
             return noteDistance % differential == 0;
         }
-        private void CheckParallelFifths()
-        {
-            DBG.WriteLine("Checking parallel fifths.");
-            Interval[] start = {
-                new(0, 1, 0),
-                new(0, 2, 0),
-                new(0, 3, 0),
-                new(1, 2, 0),
-                new(1, 3, 0),
-                new(2, 3, 0)
-            };
-
-            foreach (Interval interval in start)
-            {
-                if (IsPerfect(interval, Consts.PERFECT_FIFTH_DIFFERENTIAL, "fifth"))
-                {
-                    _fifths.Add(interval);
-                }
-            }
-            for (int i = 1; i < _voices!.Count; i++)
-            {
-                Interval[] curr = {
-                        new(0, 1, i),
-                        new(0, 2, i),
-                        new(0, 3, i),
-                        new(1, 2, i),
-                        new(1, 3, i),
-                        new(2, 3, i)
-                    };
-
-                foreach (Interval interval in curr)
-                {
-                    if (IsPerfect(interval, Consts.PERFECT_FIFTH_DIFFERENTIAL, "fifth"))
-                    {
-                        DBG.WriteLine($"{interval} is a perfect fifth.");
-                        Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);
-                        _fifths.Add(interval);
-                        if (_fifths.Contains(check))
-                        {
-                            HasParallelFifths = true;
-                            string topName = Consts.VOICE_NAMES[interval.TopVoice], bottomName = Consts.VOICE_NAMES[interval.BottomVoice];
-                            Console.WriteLine($"Parallel fifths found between {topName} and {bottomName} at {interval.Pos}.");
-                        }
-                    }
-                }
-            }
-        }
-        private void CheckParallelOctaves()
+        public void _checkParallels(string intervalName, int differential)
         {
             DBG.WriteLine("Checking parallel octaves.");
             Interval[] start = {
@@ -136,7 +87,7 @@ namespace Parallelograph.Controllers
             {
                 if (IsPerfect(interval, Consts.PERFECT_OCTAVE_DIFFERENTIAL, "octave"))
                 {
-                    _octaves.Add(interval);
+                    _intervals.Add(interval);
                 }
             }
             for (int i = 1; i < _voices!.Count; i++)
@@ -156,21 +107,28 @@ namespace Parallelograph.Controllers
                     {
                         DBG.WriteLine($"{interval} is a perfect octave.");
                         Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);
-                        _octaves.Add(interval);
-                        if (_octaves.Contains(check))
+                        _intervals.Add(interval);
+                        if (_intervals.Contains(check))
                         {
-                            HasParallelOctaves = true;
+                            ParallelsPresent.Add(intervalName);
                             string topName = Consts.VOICE_NAMES[interval.TopVoice], bottomName = Consts.VOICE_NAMES[interval.BottomVoice];
                             Console.WriteLine($"Parallel octaves found between {topName} and {bottomName} at {interval.Pos}.");
                         }
                     }
                 }
             }
+            _intervals.Clear();
         }
         public void CheckParallels()
         {
-            CheckParallelFifths();
-            CheckParallelOctaves(); //TODO add unison support.
+            Dictionary<string, int> intervals = new() {
+                {"fifth", Consts.PERFECT_FIFTH_DIFFERENTIAL},
+                {"octave", Consts.PERFECT_OCTAVE_DIFFERENTIAL}
+            };
+            foreach (KeyValuePair<string, int> interval in intervals)
+            {
+                _checkParallels(interval.Key, interval.Value);
+            }
         }
     }
 }
