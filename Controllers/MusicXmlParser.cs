@@ -6,9 +6,6 @@ using System.Xml.Linq;
 
 namespace Parallelograph.Controllers
 {
-    //Store pairs based upon voices: 
-    //Example: Start at 0 and set a "last" variable, then iterate through from 1 in the soprano line. Simple for loop. Keep track of
-    //octaves in one structure, fifths in another. Write the encoding of pairs 
     internal class MusicXmlParser
     {
         private Dictionary<string, int> PitchClasses = new() //TODO double sharps/flats, etc.
@@ -37,6 +34,7 @@ namespace Parallelograph.Controllers
         };
         private Dictionary<int, List<int>> NoteMap = new();
         private List<List<int>> FourParts = new();
+        
         public MusicXmlParser(string musicXmlFilePath)
         {
             XDocument document;
@@ -48,6 +46,7 @@ namespace Parallelograph.Controllers
             {
                 throw new InvalidMusicXmlDataException("Failed to get root element from XML. Make sure you don't have a malformed/corrupted file.");
             }
+
             try
             {
                 DBG.WriteLine("Parsing measures.");
@@ -55,7 +54,7 @@ namespace Parallelograph.Controllers
                 foreach (var measure in document.Root.Elements("part").Elements("measure"))
                 {
                     var notes = measure.Elements("note");
-                    var _notes = notes.Count();                                      
+                    var _notes = notes.Count();
                     foreach (var note in notes)
                     {
 
@@ -74,7 +73,7 @@ namespace Parallelograph.Controllers
                         }
 
                         NoteMap[voice].Add((octave * 12) + pitch); //We likely can get away without octave displacement in the map for now, but I want to keep this intact in case we need it later.
-                      
+
                     }
                 }
 #pragma warning restore CS8602

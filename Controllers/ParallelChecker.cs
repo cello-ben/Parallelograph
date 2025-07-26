@@ -102,13 +102,14 @@ namespace Parallelograph.Controllers
 
             _intervals.Clear();
         }
-        
+
         public void CheckParallels()
         {
             Dictionary<string, int> intervals = new() {
                 {"fifth", Consts.PERFECT_FIFTH_DIFFERENTIAL},
                 {"octave", Consts.PERFECT_OCTAVE_DIFFERENTIAL}
             };
+            
             foreach (KeyValuePair<string, int> interval in intervals)
             {
                 _checkParallels(interval.Key, interval.Value);
