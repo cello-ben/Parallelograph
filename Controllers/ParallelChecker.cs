@@ -65,6 +65,7 @@ namespace Parallelograph.Controllers
                     _intervals.Add(interval);
                 }
             }
+
             for (int i = 1; i < _voices!.Count; i++)
             {
                 Interval[] curr = [
@@ -98,8 +99,10 @@ namespace Parallelograph.Controllers
                     }
                 }
             }
+
             _intervals.Clear();
         }
+        
         public void CheckParallels()
         {
             Dictionary<string, int> intervals = new() {
