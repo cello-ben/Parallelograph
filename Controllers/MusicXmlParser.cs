@@ -57,7 +57,6 @@ namespace Parallelograph.Controllers
                     var _notes = notes.Count();
                     foreach (var note in notes)
                     {
-
                         int octave = Int32.Parse(note.Element("pitch").Element("octave").Value);
                         int voice = Int32.Parse(note.Element("voice").Value);
                         string element = $"{note.Element("pitch")?.Element("step")?.Value}{note.Element("accidental")?.Value.Replace("natural", "")}";
@@ -74,7 +73,6 @@ namespace Parallelograph.Controllers
 
                         int pitch = PitchClasses[element];
                         NoteMap[voice].Add((octave * 12) + pitch); //We likely can get away without octave displacement in the map for now, but I want to keep this intact in case we need it later.
-
                     }
                 }
 #pragma warning restore CS8602
