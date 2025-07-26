@@ -7,10 +7,9 @@ namespace Parallelograph.Controllers
 {
     internal class ParallelChecker
     {
-
-        public HashSet<string> ParallelsPresent = new();
-        private HashSet<Interval> _intervals = [];
-        private List<List<int>>? _voices;
+        public readonly HashSet<string> ParallelsPresent = [];
+        private readonly HashSet<Interval> _intervals = [];
+        private readonly List<List<int>>? _voices;
 
         public ParallelChecker(string? xmlFilePath)
         {
@@ -43,58 +42,49 @@ namespace Parallelograph.Controllers
         {
             int top = _voices![interval.TopVoice][interval.Pos], bottom = _voices![interval.BottomVoice][interval.Pos]; //TODO more bounds checking before unwrapping.
             int noteDistance = Math.Abs(top - bottom);
-            bool isPerfect = noteDistance % differential == 0;
-
-            if (isPerfect)
-            {
-                string topVoiceName = Consts.VOICE_NAMES[interval.TopVoice],
-                    bottomVoiceName = Consts.VOICE_NAMES[interval.BottomVoice];
-
-                string topNoteData = $"({Consts.NOTE_NAMES[top % 12]}{top / 12}) ({top})",
-                    bottomNoteData = $"({Consts.NOTE_NAMES[bottom % 12]}{bottom / 12}) ({bottom})";
-
-                Console.WriteLine();
-                Console.WriteLine($"Found perfect {intervalName}:");
-                Console.WriteLine($"Top voice: {topVoiceName} {topNoteData}");
-                Console.WriteLine($"Bottom voice: {bottomVoiceName} {bottomNoteData}");
-                Console.WriteLine();
-            }
-
             return noteDistance % differential == 0;
         }
+        
         public void _checkParallels(string intervalName, int differential)
         {
             DBG.WriteLine($"Checking parallel {intervalName}s.");
-            Interval[] start = {
+            Interval[] start = [
                 new(0, 1, 0),
                 new(0, 2, 0),
                 new(0, 3, 0),
                 new(1, 2, 0),
                 new(1, 3, 0),
                 new(2, 3, 0)
-            };
+            ];
 
             foreach (Interval interval in start)
             {
                 if (IsPerfect(interval, differential, intervalName))
                 {
+                    DBG.WriteLine($"Perfect interval: {interval}");
                     _intervals.Add(interval);
                 }
             }
             for (int i = 1; i < _voices!.Count; i++)
             {
-                Interval[] curr = {
+                Interval[] curr = [
                         new(0, 1, i),
                         new(0, 2, i),
                         new(0, 3, i),
                         new(1, 2, i),
                         new(1, 3, i),
                         new(2, 3, i)
-                    };
+                    ];
 
                 foreach (Interval interval in curr)
                 {
-		    if (IsPerfect(interval, differential, intervalName))
+                    string topVoiceName = Consts.VOICE_NAMES[interval.TopVoice],
+                    bottomVoiceName = Consts.VOICE_NAMES[interval.BottomVoice];
+                    int top = _voices![interval.TopVoice][interval.Pos], bottom = _voices![interval.BottomVoice][interval.Pos];
+                    string topNoteData = $"({Consts.NOTE_NAMES[top % 12]}{top / 12}) ({top})",
+                    bottomNoteData = $"({Consts.NOTE_NAMES[bottom % 12]}{bottom / 12}) ({bottom})";
+
+                    if (IsPerfect(interval, differential, intervalName))
                     {
                         DBG.WriteLine($"{interval} is a perfect {intervalName}.");
                         Interval check = new(interval.TopVoice, interval.BottomVoice, interval.Pos - 1);

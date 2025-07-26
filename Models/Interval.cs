@@ -1,21 +1,16 @@
+using Parallelograph.Util.Consts;
+
 namespace Parallelograph.Models
 {
-    internal readonly struct Interval
+    internal readonly struct Interval(int topVoice, int bottomVoice, int pos)
     {
-        public int TopVoice { get; }
-        public int BottomVoice { get; }
-        public int Pos { get; }
-
-        public Interval(int topVoice, int bottomVoice, int pos)
-        {
-            TopVoice = topVoice;
-            BottomVoice = bottomVoice;
-            Pos = pos;
-        }
+        public int TopVoice { get; } = topVoice;
+        public int BottomVoice { get; } = bottomVoice;
+        public int Pos { get; } = pos;
 
         public override string ToString()
         {
-            return $"{TopVoice} - {BottomVoice} at {Pos}";
+            return $"{Consts.VOICE_NAMES[TopVoice]} - {Consts.VOICE_NAMES[BottomVoice]} at position {Pos} (note {Pos + 1})";
         }
 
     }
