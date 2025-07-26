@@ -61,24 +61,24 @@ namespace Parallelograph.Controllers
                         int octave = Int32.Parse(note.Element("pitch").Element("octave").Value);
                         int voice = Int32.Parse(note.Element("voice").Value);
                         string element = $"{note.Element("pitch")?.Element("step")?.Value}{note.Element("accidental")?.Value.Replace("natural", "")}";
+
                         if (!PitchClasses.ContainsKey(element))
                         {
                             throw new InvalidMusicXmlDataException("Invalid note name found.");
                         }
-                        int pitch = PitchClasses[element];
 
                         if (!NoteMap.ContainsKey(voice))
                         {
                             NoteMap[voice] = new List<int>();
                         }
 
+                        int pitch = PitchClasses[element];
                         NoteMap[voice].Add((octave * 12) + pitch); //We likely can get away without octave displacement in the map for now, but I want to keep this intact in case we need it later.
 
                     }
                 }
 #pragma warning restore CS8602
                 DBG.WriteLine("Parsing done.");
-
             }
             catch
             {
