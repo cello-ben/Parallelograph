@@ -41,6 +41,8 @@ namespace Parallelograph.Controllers
             try
             {
                 document = XDocument.Load(musicXmlFilePath);
+                DBG.WriteLine("XML Tree:");
+                DBG.PrintTree(document);
             }
             catch
             {
@@ -51,14 +53,15 @@ namespace Parallelograph.Controllers
             {
                 DBG.WriteLine("Parsing measures.");
 #pragma warning disable CS8602 //We are handling the case where critical elements are null via an exception.
+                int count = 0;
                 foreach (var measure in document.Root.Elements("part").Elements("measure"))
                 {
+                    count++;
                     var notes = measure.Elements("note");
-                    var _notes = notes.Count();
                     foreach (var note in notes)
                     {
-                        int octave = Int32.Parse(note.Element("pitch").Element("octave").Value);
-                        int voice = Int32.Parse(note.Element("voice").Value);
+                        int octave = int.Parse(note.Element("pitch").Element("octave").Value);
+                        int voice = int.Parse(note.Element("voice").Value);
                         string element = $"{note.Element("pitch")?.Element("step")?.Value}{note.Element("accidental")?.Value.Replace("natural", "")}";
 
                         if (!PitchClasses.ContainsKey(element))
@@ -77,6 +80,7 @@ namespace Parallelograph.Controllers
                 }
 #pragma warning restore CS8602
                 DBG.WriteLine("Parsing done.");
+                DBG.WriteLine($"Measures: {count}");
             }
             catch
             {
@@ -91,6 +95,7 @@ namespace Parallelograph.Controllers
             {
                 FourParts.Add(pair.Value);
             }
+            DBG.PrintMap(FourParts);
             return FourParts;
         }
     }

@@ -17,7 +17,7 @@ namespace Parallelograph.Controllers
             {
                 MusicXmlParser parser = new(xmlFilePath ?? "");
                 _voices = parser.CoalesceAndGetFourParts();
-                DBG.WriteLine("In ParallelChecker constructor.");
+                DBG.WriteLine("BEGIN ParallelChecker constructor.");
                 if (_voices is null || _voices.Count != Consts.VOICE_COUNT)
                 {
                     throw new InvalidMusicXmlDataException("Invalid number of voices.");
@@ -33,9 +33,10 @@ namespace Parallelograph.Controllers
             catch (Exception ex)
             {
                 Console.Error.Write("Exception found:");
-                Console.Error.Write(ex);
+                DBG.WriteError(ex, ex.Message);
                 Console.Error.Write("Failed to create parser. Please make sure you are passing a valid file.");
             }
+            DBG.WriteLine("END ParallelChecker constructor.");
         }
 
         private bool IsPerfect(Interval interval, int differential, string intervalName)
@@ -104,12 +105,12 @@ namespace Parallelograph.Controllers
         }
 
         public void CheckParallels()
-        {
+        {DBG.PrintMap(_voices!);
             Dictionary<string, int> intervals = new() {
                 {"fifth", Consts.PERFECT_FIFTH_DIFFERENTIAL},
                 {"octave", Consts.PERFECT_OCTAVE_DIFFERENTIAL}
             };
-            
+
             foreach (KeyValuePair<string, int> interval in intervals)
             {
                 _checkParallels(interval.Key, interval.Value);

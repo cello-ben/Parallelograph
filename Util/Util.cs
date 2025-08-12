@@ -1,9 +1,11 @@
+using Parallelograph.Models;
+
 namespace Parallelograph.Util
 {
     internal static class STR
     {
         const char LOWER_UPPER_ASCII_DIFFERENTIAL = (char)32;
-        public static string ToTitleCase(string s)
+        public static string ToTitleCase(string s) //TODO make idiomatic
         {
             if (s is null || s.Length == 0)
             {
